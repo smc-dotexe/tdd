@@ -2,6 +2,8 @@
 using RoomBookingApp.Core.Domain;
 using RoomBookingApp.Core.Domain.Enums;
 using RoomBookingApp.Core.Models;
+using RoomBookingApp.Domain;
+using RoomBookingApp.Domain.BaseModels;
 using System;
 using System.Linq;
 
@@ -32,6 +34,7 @@ namespace RoomBookingApp.Core.Processors
                 roomBooking.RoomId = room.Id;
                 _roomBookingService.Save(roomBooking);
 
+                result.RoomBookingId = roomBooking.Id;
                 result.Flag = BookingResultFlag.Success;
             }
             else

@@ -4,6 +4,7 @@ using RoomBookingApp.Core.Domain;
 using RoomBookingApp.Core.Domain.Enums;
 using RoomBookingApp.Core.Models;
 using RoomBookingApp.Core.Processors;
+using RoomBookingApp.Domain;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -105,6 +106,28 @@ namespace RoomBookingApp.Core
 
             var result = _processor.BookRoom(_request);
             bookingSuccessFlag.ShouldBe(result.Flag);
+        }
+
+        [Theory]
+        [InlineData(1, true)]
+        [InlineData(null, false)]
+        public void Should_Return_RoomBookingId_In_Result(int? roomBookingId, bool isAvailable)
+        {
+            if (!isAvailable)
+            {
+                _availableRooms.Clear();
+            }
+            else
+            {
+                _roomBookingServiceMock.Setup(q => q.Save(It.IsAny<RoomBooking>()))
+                    .Callback<RoomBooking>(booking =>
+                    {
+                        booking.Id = roomBookingId.Value;
+                    });
+            }
+
+            var result = _processor.BookRoom(_request);
+            result.RoomBookingId.ShouldBe(roomBookingId);
         }
     }
 }
