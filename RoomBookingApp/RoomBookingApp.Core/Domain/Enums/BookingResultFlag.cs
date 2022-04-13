@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RoomBookingApp.Core.Domain
+namespace RoomBookingApp.Core.Domain.Enums
 {
-    public class Room
+    public enum BookingResultFlag
     {
-        public int Id { get; set; }
+        Success,
+        Failure
     }
 }

@@ -1,11 +1,13 @@
 ﻿using Moq;
 using RoomBookingApp.Core.DataServices;
 using RoomBookingApp.Core.Domain;
+using RoomBookingApp.Core.Domain.Enums;
 using RoomBookingApp.Core.Models;
 using RoomBookingApp.Core.Processors;
 using Shouldly;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace RoomBookingApp.Core
@@ -25,7 +27,7 @@ namespace RoomBookingApp.Core
                 Email = "test@request.com",
                 Date = new DateTime(2022, 10, 20)
             };
-            _availableRooms = new List<Room>() { new Room() };
+            _availableRooms = new List<Room>() { new Room() { Id = 1 } };
             _roomBookingServiceMock = new Mock<IRoomBookingService>();
             _roomBookingServiceMock.Setup(q => q.GetAvailableRooms(_request.Date))
                 .Returns(_availableRooms);
@@ -79,6 +81,7 @@ namespace RoomBookingApp.Core
             savedBooking.FullName.ShouldBe(_request.FullName);
             savedBooking.Email.ShouldBe(_request.Email);
             savedBooking.Date.ShouldBe(_request.Date);
+            savedBooking.RoomId.ShouldBe(_availableRooms.First().Id);
         }
 
         [Fact]
@@ -87,6 +90,21 @@ namespace RoomBookingApp.Core
             _availableRooms.Clear();
             _processor.BookRoom(_request);
             _roomBookingServiceMock.Verify(q => q.Save(It.IsAny<RoomBooking>()), Times.Never);
+        }
+
+        // Data driven tests
+        [Theory]
+        [InlineData(BookingResultFlag.Failure, false)] // providing data scenarios to the test
+        [InlineData(BookingResultFlag.Success, true)]
+        public void Should_Return_SuccessOrFailure_Flag_In_Result(BookingResultFlag bookingSuccessFlag, bool isAvailable)
+        {
+            if (!isAvailable)
+            {
+                _availableRooms.Clear();
+            }
+
+            var result = _processor.BookRoom(_request);
+            bookingSuccessFlag.ShouldBe(result.Flag);
         }
     }
 }
