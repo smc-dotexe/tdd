@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace RoomBookingApp.Core.Processors
 {
-    public class RoomBookingRequestProcessor
+    public class RoomBookingRequestProcessor : IRoomBookingRequestProcessor
     {
         private IRoomBookingService _roomBookingService;
 
@@ -30,7 +30,7 @@ namespace RoomBookingApp.Core.Processors
             if (availableRooms.Any())
             {
                 var room = availableRooms.First();
-                var roomBooking = CreateRoomBookingObject<RoomBooking>(bookingRequest); 
+                var roomBooking = CreateRoomBookingObject<RoomBooking>(bookingRequest);
                 roomBooking.RoomId = room.Id;
                 _roomBookingService.Save(roomBooking);
 
